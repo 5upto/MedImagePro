@@ -1,0 +1,7 @@
+Pillow
+fpdf2
+pydicom
+numpy
+ultralytics
+torch
+torchvision

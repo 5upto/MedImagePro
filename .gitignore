@@ -1,0 +1,84 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+
+# Jupyter Notebook Checkpoints
+.ipynb_checkpoints/
+
+# =========================
+# VS Code
+# =========================
+.vscode/
+.history/
+
+# =========================
+# Build / Distribution
+# =========================
+build/
+dist/
+*.egg-info/
+*.spec
+
+# =========================
+# Logs
+# =========================
+*.log
+
+# =========================
+# Environment Variables
+# =========================
+.env
+.env.*
+
+# =========================
+# OS Files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Model Files (Optional)
+# Uncomment if models are large
+# =========================
+# *.pt
+# *.pth
+# *.onnx
+
+# =========================
+# Dataset / Images (Optional)
+# Uncomment if you don't want datasets in git
+# =========================
+# *.jpg
+# *.jpeg
+# *.png
+# *.gif
+# Resources/
+
+# =========================
+# SQLite Databases
+# =========================
+*.db
+*.sqlite3
+
+# =========================
+# Temporary Files
+# =========================
+*.tmp
+*.temp
+*.bak
+*.swp
+
+# =========================
+# PyInstaller
+# =========================
+*.manifest
+*.exe
