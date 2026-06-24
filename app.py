@@ -204,7 +204,20 @@ class Dicomet:
 
         if os.name == 'nt':
             ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("myappid")
-            self.root.iconbitmap(os.path.join(self.res_dir, 'MedImagePro.ico'))
+            try:
+                self.root.iconbitmap(os.path.join(self.res_dir, 'MedImagePro.ico'))
+            except Exception:
+                pass
+
+        try:
+            icon_img = Image.open(os.path.join(self.res_dir, 'app.png'))
+            bbox = icon_img.getbbox()
+            if bbox:
+                icon_img = icon_img.crop(bbox)
+            self.win_icon = ImageTk.PhotoImage(icon_img)
+            self.root.iconphoto(True, self.win_icon)
+        except Exception as e:
+            print("Window icon load error:", e)
 
         self.setup_styles()
         self.load_icons()
@@ -220,14 +233,15 @@ class Dicomet:
         left = tk.Frame(hdr, bg=self.C['panel'])
         left.pack(side=tk.LEFT, padx=14, pady=6)
         
-        # Load and place IITMANDI and VIML logos in the brand area
+        # Load and place app.png in the brand area
         try:
-            for f, s in [('VIML.png', 20), ('IITMANDI.png', 24)]:
-                img = Image.open(os.path.join(self.res_dir, f)).resize((s, s), Image.LANCZOS)
-                attr_name = f"logo_{f.replace('.', '_')}"
-                setattr(self, attr_name, ImageTk.PhotoImage(img))
-            tk.Label(left, image=self.logo_VIML_png, bg=self.C['panel']).pack(side=tk.LEFT, padx=(0, 4))
-            tk.Label(left, image=self.logo_IITMANDI_png, bg=self.C['panel']).pack(side=tk.LEFT, padx=(0, 10))
+            img = Image.open(os.path.join(self.res_dir, 'app.png'))
+            bbox = img.getbbox()
+            if bbox:
+                img = img.crop(bbox)
+            img = img.resize((32, 32), Image.LANCZOS)
+            self.logo_app_png = ImageTk.PhotoImage(img)
+            tk.Label(left, image=self.logo_app_png, bg=self.C['panel']).pack(side=tk.LEFT, padx=(0, 10))
         except Exception as e:
             print("Logo load error:", e)
 
@@ -419,6 +433,17 @@ class Dicomet:
                                          font=('Segoe UI', self.FS['status']))
         self.image_info_label.pack(side=tk.LEFT, padx=(18, 0))
 
+        # Load and place IITMANDI and VIML logos in the footer
+        try:
+            for f, s in [('VIML.png', 18), ('IITMANDI.png', 20)]:
+                img = Image.open(os.path.join(self.res_dir, f)).resize((s, s), Image.LANCZOS)
+                attr_name = f"logo_{f.replace('.', '_')}"
+                setattr(self, attr_name, ImageTk.PhotoImage(img))
+            tk.Label(sb, image=self.logo_VIML_png, bg=self.C['panel']).pack(side=tk.RIGHT, padx=(4, 0))
+            tk.Label(sb, image=self.logo_IITMANDI_png, bg=self.C['panel']).pack(side=tk.RIGHT, padx=(4, 0))
+        except Exception as e:
+            print("Footer logos load error:", e)
+
         # ── CANVAS BINDINGS ────────────────────────────
         self.processed_canvas.bind("<Button-1>", self.canvas_click)
         self.processed_canvas.bind("<Double-1>", self.canvas_double_click)
@@ -486,8 +511,32 @@ class Dicomet:
             if file_path.lower().endswith('.dcm'):
                 self.dicom_image = pydicom.dcmread(file_path)
                 pixel_array = self.dicom_image.pixel_array
+                
+                # Squeeze singleton dimensions (e.g., (1, H, W) -> (H, W))
+                if pixel_array.ndim > 2:
+                    for axis in reversed(range(pixel_array.ndim)):
+                        if pixel_array.shape[axis] == 1 and pixel_array.ndim > 2:
+                            pixel_array = np.squeeze(pixel_array, axis=axis)
+                
+                # Handle multi-dimensional arrays (multi-frame / volumes)
+                if pixel_array.ndim == 4:
+                    # Shape is typically (frames, H, W, channels) -> extract first frame
+                    pixel_array = pixel_array[0]
+                
+                if pixel_array.ndim == 3:
+                    # Check if the last dimension represents RGB/RGBA channels
+                    if pixel_array.shape[-1] not in (3, 4):
+                        # Shape is (slices, H, W) -> extract the middle slice
+                        mid_idx = pixel_array.shape[0] // 2
+                        pixel_array = pixel_array[mid_idx]
+                
                 pixel_array = self.normalize_pixel_array(pixel_array)
-                image = Image.fromarray(pixel_array).convert('L')
+                
+                if pixel_array.ndim == 3 and pixel_array.shape[-1] in (3, 4):
+                    image = Image.fromarray(pixel_array)
+                else:
+                    image = Image.fromarray(pixel_array).convert('L')
+                
                 self.dicom_text = str(self.dicom_image)
             else:
                 image = Image.open(file_path)
