@@ -79,7 +79,7 @@ class Dicomet:
 
     def load_icons(self):
         self.icons = {}
-        res_dir = os.path.join(os.path.dirname(__file__), 'Resources')
+        res_dir = self.res_dir
         icon_map = {
             'folder': 'folder.png', 'play': 'play.png', 'undo': 'undo.png',
             'restore': 'restore.png', 'pdf': 'pdf.png', 'dicom': 'dicom.png',
@@ -200,14 +200,16 @@ class Dicomet:
         self.root.configure(bg=self.C['bg'])
         self.root.minsize(1100, 700)
 
+        self.res_dir = os.path.join(os.path.dirname(__file__), 'Resources')
+
         if os.name == 'nt':
             ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("myappid")
-            self.root.iconbitmap(icon_path)
+            self.root.iconbitmap(os.path.join(self.res_dir, 'MedImagePro.ico'))
 
         self.setup_styles()
         self.load_icons()
 
-        self.model = YOLO('yolov8l.pt')
+        self.model = YOLO(os.path.join(self.res_dir, 'yolov8l.pt'))
         self.deeplab_model = deeplabv3_resnet50(pretrained=True).eval()
 
         # ── HEADER ───────────────────────────────────────
@@ -221,7 +223,7 @@ class Dicomet:
         # Load and place IITMANDI and VIML logos in the brand area
         try:
             for f, s in [('VIML.png', 20), ('IITMANDI.png', 24)]:
-                img = Image.open(f).resize((s, s), Image.LANCZOS)
+                img = Image.open(os.path.join(self.res_dir, f)).resize((s, s), Image.LANCZOS)
                 attr_name = f"logo_{f.replace('.', '_')}"
                 setattr(self, attr_name, ImageTk.PhotoImage(img))
             tk.Label(left, image=self.logo_VIML_png, bg=self.C['panel']).pack(side=tk.LEFT, padx=(0, 4))
@@ -458,7 +460,7 @@ class Dicomet:
         self.loading_timer = None
 
         # ── LOADING GIF ────────────────────────────────
-        loading_image = Image.open('loading.gif')
+        loading_image = Image.open(os.path.join(self.res_dir, 'loading.gif'))
         self.loading_frames = []
         for frame in ImageSequence.Iterator(loading_image):
             frame = frame.convert("RGBA")
@@ -986,8 +988,8 @@ class Dicomet:
             pdf.set_auto_page_break(auto=True, margin=10)
             
             # Define logo images and their dimensions
-            logo_viml = "VIML.png"
-            logo_iitmandi = "IITMANDI.png"
+            logo_viml = os.path.join(self.res_dir, "VIML.png")
+            logo_iitmandi = os.path.join(self.res_dir, "IITMANDI.png")
             logo_width = 20  # Adjust as per your requirement
             logo_height = 20  # Adjust as per your requirement
 
@@ -1299,5 +1301,5 @@ class Dicomet:
 if __name__ == "__main__":
     root = tk.Tk()
     app = Dicomet(root)
-    # root.wm_iconbitmap('MedImagePro.ico')
+    # root.wm_iconbitmap(os.path.join('Resources', 'MedImagePro.ico'))
     root.mainloop()     
