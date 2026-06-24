@@ -4,6 +4,10 @@
 __pycache__/
 *.py[cod]
 *$py.class
+app_backup.py
+beta_final.ipynb
+prefinal.ipynb
+IMG_20230919_123456.jpg
 
 # Virtual Environment
 venv/
