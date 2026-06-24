@@ -204,10 +204,6 @@ class Dicomet:
 
         if os.name == 'nt':
             ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("myappid")
-            try:
-                self.root.iconbitmap(os.path.join(self.res_dir, 'MedImagePro.ico'))
-            except Exception:
-                pass
 
         try:
             icon_img = Image.open(os.path.join(self.res_dir, 'app.png'))
