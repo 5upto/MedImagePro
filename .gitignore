@@ -4,10 +4,16 @@
 __pycache__/
 *.py[cod]
 *$py.class
+
+# Jupyter
+*.ipynb
+
+# Backup files
 app_backup.py
-beta_final.ipynb
-prefinal.ipynb
-IMG_20230919_123456.jpg
+*_backup.py
+
+# DICOM samples
+IMG-*.dcm
 
 # Virtual Environment
 venv/
