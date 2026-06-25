@@ -146,12 +146,10 @@ class DialogsMixin:
             tk.Label(inner, text=body, bg=self.C['panel'], fg=self.C['text_secondary'],
                      font=('Segoe UI', 9), justify=tk.LEFT).pack(anchor='w')
 
-        tk.Button(inner, text="Close", command=w.destroy,
-                  bg=self.C['accent'], fg=self.C['text_on_accent'],
-                  relief=tk.FLAT, padx=20, pady=4,
-                  font=('Segoe UI', 10),
-                  activebackground=self.C['accent_hover'],
-                  cursor='hand2').pack(pady=(16, 4))
+        self.make_btn(inner, '', 'Close', w.destroy,
+                      btn_bg=self.C['accent'], btn_fg=self.C['text_on_accent'],
+                      hover_bg=self.C['accent_hover'], padx=20, pady=4,
+                      font_size=10, corner_radius=10).pack(pady=(16, 4))
 
     def show_settings(self):
         w = tk.Toplevel(self.root)
@@ -186,9 +184,7 @@ class DialogsMixin:
                                 anchor='w', cursor='hand2')
             cb.pack(fill=tk.X, pady=3)
 
-        tk.Button(inner, text="Apply", command=w.destroy,
-                  bg=self.C['accent'], fg=self.C['text_on_accent'],
-                  relief=tk.FLAT, padx=20, pady=4,
-                  font=('Segoe UI', 10),
-                  activebackground=self.C['accent_hover'],
-                  cursor='hand2').pack(pady=(16, 4))
+        self.make_btn(inner, '', 'Apply', w.destroy,
+                      btn_bg=self.C['accent'], btn_fg=self.C['text_on_accent'],
+                      hover_bg=self.C['accent_hover'], padx=20, pady=4,
+                      font_size=10, corner_radius=10).pack(pady=(16, 4))

@@ -85,6 +85,7 @@ class Dicomet(LayoutMixin, WidgetsMixin, DialogsMixin, ImageOpsMixin, Annotation
 
         self.build_layout()
         self._init_state()
+        self.root.after_idle(self._sync_initial_layout)
 
     def _init_state(self):
         self.detections = []
@@ -113,3 +114,7 @@ class Dicomet(LayoutMixin, WidgetsMixin, DialogsMixin, ImageOpsMixin, Annotation
     def set_status(self, text):
         self.status_label.config(text=text)
         self.root.update_idletasks()
+
+    def _sync_initial_layout(self):
+        self.root.update_idletasks()
+        self.root.after(50, self.root.update_idletasks)
