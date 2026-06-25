@@ -51,7 +51,8 @@ class LayoutMixin:
                       font_size=self.FS['tiny']).pack(side=tk.RIGHT, padx=1)
 
     def _build_toolbar(self):
-        tb_card = self.make_round_card(self.root, padx=14, pady=(6, 2), fill=tk.X)
+        tb_card = self.make_round_card(self.root, padx=14, pady=(4, 1), fill=tk.X,
+                                       content_inset=2)
         tb_row = tk.Frame(tb_card, bg=self.C['panel'])
         tb_row.pack(side=tk.TOP, fill=tk.X)
 
@@ -65,11 +66,11 @@ class LayoutMixin:
         for group_index, group in enumerate(groups):
             if group_index:
                 self.make_sep(tb_row)
-            group_container = tk.Frame(tb_row, bg=self.C['panel'],
-                                       highlightbackground=self.C['border'], highlightthickness=1)
-            group_container.pack(side=tk.LEFT, padx=2, pady=1)
+            group_container = self.make_round_card(tb_row, side=tk.LEFT, fill=tk.X,
+                                                   padx=1, pady=0, corner_radius=10,
+                                                   content_inset=1)
             group_inner = tk.Frame(group_container, bg=self.C['panel'])
-            group_inner.pack(side=tk.TOP, fill=tk.X, padx=2, pady=2)
+            group_inner.pack(side=tk.TOP, fill=tk.X)
             for icon_name, text, command in group:
                 is_apply = text == 'Apply'
                 bg = self.C['accent'] if is_apply else self.C['panel']
@@ -77,7 +78,7 @@ class LayoutMixin:
                 hover = self.C['accent_hover'] if is_apply else self.C['accent_light']
                 btn = self.make_btn(group_inner, icon_name, text, command,
                                     btn_bg=bg, btn_fg=fg, hover_bg=hover,
-                                    padx=10, pady=5, font_size=self.FS['small'])
+                                    padx=8, pady=3, font_size=self.FS['small'])
                 btn.pack(side=tk.LEFT)
                 if text == 'Details':
                     self.details_toggle_button = btn
@@ -86,20 +87,21 @@ class LayoutMixin:
 
         self.model_var = StringVar(self.root)
         self.model_var.set("YOLOv8")
-        self.model_menu = tk.OptionMenu(tb_row, self.model_var, "YOLOv8", "DeepLabV3")
+        model_menu_card = self.make_round_card(tb_row, side=tk.RIGHT, fill=tk.X,
+                                               padx=1, pady=0, corner_radius=10,
+                                               content_inset=1)
+        self.model_menu = tk.OptionMenu(model_menu_card, self.model_var, "YOLOv8", "DeepLabV3")
         self.model_menu.config(bg=self.C['panel'], fg=self.C['text'],
-                               relief=tk.FLAT, highlightthickness=1,
-                               highlightbackground=self.C['border'],
-                               highlightcolor=self.C['border'],
+                               relief=tk.FLAT, highlightthickness=0,
                                borderwidth=0, font=('Segoe UI', self.FS['button']),
-                               cursor='hand2', padx=8, pady=4,
+                               cursor='hand2', padx=6, pady=2,
                                activebackground=self.C['accent_light'],
                                activeforeground=self.C['accent'])
         self.model_menu['menu'].configure(bg=self.C['panel'], fg=self.C['text'],
                                           activebackground=self.C['accent_light'],
                                           activeforeground=self.C['accent'],
                                           font=('Segoe UI', self.FS['normal']))
-        self.model_menu.pack(side=tk.RIGHT, padx=2, pady=1)
+        self.model_menu.pack(side=tk.TOP, fill=tk.X)
 
     def _build_main_workspace(self):
         self.main_frame = tk.Frame(self.root, bg=self.C['bg'])
@@ -110,7 +112,7 @@ class LayoutMixin:
         self.history_listbox = None
 
         workspace = tk.Frame(self.main_frame, bg=self.C['bg'])
-        workspace.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=14, pady=8)
+        workspace.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=14, pady=6)
 
         image_row = tk.Frame(workspace, bg=self.C['bg'])
         image_row.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
@@ -145,7 +147,8 @@ class LayoutMixin:
         return card, canvas, btn
 
     def _build_bottom_controls(self, parent):
-        ctrl_card = self.make_round_card(parent, fill=tk.X, pady=(4, 2))
+        ctrl_card = self.make_round_card(parent, fill=tk.X, pady=(2, 1),
+                                         content_inset=2)
         ctrl = tk.Frame(ctrl_card, bg=self.C['panel'])
         ctrl.pack(side=tk.TOP, fill=tk.X)
 
@@ -187,8 +190,8 @@ class LayoutMixin:
             self.make_btn(actions, icon_name, text, command, padx=6, pady=2,
                           font_size=self.FS['tiny']).pack(side=tk.LEFT, padx=1)
 
-        table_frame = tk.Frame(inner, bg=self.C['panel'])
-        table_frame.pack(side=tk.TOP, fill=tk.X, padx=6, pady=(0, 4))
+        table_frame = self.make_round_card(inner, side=tk.TOP, fill=tk.X,
+                                           padx=6, pady=(0, 4), corner_radius=10)
 
         self.annotations_tree = ttk.Treeview(table_frame, columns=('id', 'class', 'confidence', 'comment'),
                                              show='headings', height=4, selectmode='browse')

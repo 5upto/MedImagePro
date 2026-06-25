@@ -29,7 +29,7 @@ def _draw_rounded_rect(canvas, x1, y1, x2, y2, radius, **kwargs):
 class RoundedButton(tk.Canvas):
     def __init__(self, parent, image=None, text="", command=None, bg="#FFFFFF",
                  fg="#1E293B", hover_bg="#DBEAFE", border="#DCE3EB",
-                 active_fg=None, padx=10, pady=5, font=None, corner_radius=8):
+                 active_fg=None, padx=10, pady=5, font=None, corner_radius=10):
         self._font = tkfont.Font(font=font)
         self._image = image
         self._text = text
@@ -137,30 +137,48 @@ class RoundedButton(tk.Canvas):
 
 
 class RoundedCard:
-    def __init__(self, parent, bg, border, corner_radius, parent_bg):
+    def __init__(self, parent, bg, border, corner_radius, parent_bg, content_inset):
         self.outer = tk.Canvas(parent, bg=parent_bg, highlightthickness=0,
-                               relief=tk.FLAT, borderwidth=0)
+                               relief=tk.FLAT, borderwidth=0,
+                               width=1, height=1)
         self.inner = tk.Frame(self.outer, bg=bg)
         self._bg = bg
         self._border = border
         self._corner_radius = corner_radius
-        self._inset = max(4, corner_radius // 2)
+        self._inset = content_inset
         self._window_id = self.outer.create_window(self._inset, self._inset,
                                                    anchor=tk.NW, window=self.inner)
         self.inner._rounded_outer = self.outer
         self.inner._rounded_card = self
         self.outer.bind('<Configure>', self._redraw)
         self.inner.bind('<Configure>', self._sync_size)
+        self._sync_jobs = 0
+        self._queue_sync()
 
     def pack(self, **kwargs):
         self.outer.pack(**kwargs)
+        self._queue_sync()
         return self.inner
 
+    def _queue_sync(self):
+        if self._sync_jobs >= 3:
+            return
+        self._sync_jobs += 1
+        self.outer.after_idle(self._run_queued_sync)
+
+    def _run_queued_sync(self):
+        self._sync_jobs = max(0, self._sync_jobs - 1)
+        self._sync_size()
+
     def _sync_size(self, event=None):
+        self.inner.update_idletasks()
         req_width = self.inner.winfo_reqwidth() + self._inset * 2
         req_height = self.inner.winfo_reqheight() + self._inset * 2
-        self.outer.configure(width=req_width, height=req_height)
+        if self.outer.winfo_reqwidth() != req_width or self.outer.winfo_reqheight() != req_height:
+            self.outer.configure(width=req_width, height=req_height)
         self._redraw()
+        if event is not None:
+            self._queue_sync()
 
     def _redraw(self, event=None):
         width = max(self.outer.winfo_width(), self.inner.winfo_reqwidth() + self._inset * 2)
@@ -216,7 +234,7 @@ class WidgetsMixin:
                 self.icons[name] = tk.PhotoImage(file=path)
 
     def make_btn(self, parent, icon_name, text, command, btn_bg=None, btn_fg=None,
-                 hover_bg=None, padx=10, pady=5, font_size=None, corner_radius=8):
+                 hover_bg=None, padx=10, pady=5, font_size=None, corner_radius=10):
         icon = self.icons.get(icon_name)
         bg = btn_bg or self.C['panel']
         fg = btn_fg or self.C['text']
@@ -235,13 +253,13 @@ class WidgetsMixin:
         return s
 
     def make_round_card(self, parent, padx=0, pady=0, side=tk.TOP, fill=tk.X,
-                        expand=False, corner_radius=10):
+                        expand=False, corner_radius=10, content_inset=3):
         try:
             parent_bg = parent.cget('bg')
         except tk.TclError:
             parent_bg = self.C['bg']
         card = RoundedCard(parent, self.C['panel'], self.C['border'],
-                           corner_radius, parent_bg)
+                           corner_radius, parent_bg, content_inset)
         return card.pack(side=side, fill=fill, expand=expand, padx=padx, pady=pady)
 
     def _make_modern_slider(self, parent, command, from_=10, to=0.1, initial=1,
