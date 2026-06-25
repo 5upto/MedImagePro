@@ -1,8 +1,8 @@
-# Dicomet
+# Dicomet (previously MedImagePro)
 
 **Intelligent DICOM Imaging Platform**
 
-Dicomet is a desktop application for medical image visualization, AI-assisted analysis, annotation, and reporting. It enables medical professionals, researchers, and imaging specialists to work with DICOM studies and standard image formats while leveraging state-of-the-art deep learning models for detection and segmentation.
+Dicomet is a desktop application for medical image visualization, AI-assisted analysis, annotation, and reporting, a project by the **VIML Group, IIT Mandi**. It enables medical professionals, researchers, and imaging specialists to work with DICOM studies and standard image formats while leveraging state-of-the-art deep learning models for detection and segmentation.
 
 ---
 
@@ -179,7 +179,7 @@ pip install -r requirements.txt
 ## Running Dicomet
 
 ```bash
-python app.py
+python src/main.py
 ```
 
 ---
@@ -187,11 +187,14 @@ python app.py
 ## Project Structure
 
 ```text
-MedImagePro/
+DICOMET_MedImagePro/
 │
-├── Resources/
-├── venv/
-├── app.py
+├── Resources/       # Icons, images, and model weights
+├── src/             # Application source code
+│   ├── core/        # Core logic (annotation, export, image, state)
+│   ├── ui/          # User interface (application, dialogs, layout, widgets)
+│   └── main.py      # Application entry point
+├── venv/            # Virtual environment
 ├── requirements.txt
 ├── README.md
 └── .gitignore
